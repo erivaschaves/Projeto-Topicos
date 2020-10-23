@@ -1,14 +1,14 @@
 FROM ubuntu:16.04
 MAINTAINER LiamFiddler <design+docker@liamfiddler.com>
 
-# Set correct environment variables
+
 ENV HOME /root
 ENV DEBIAN_FRONTEND noninteractive
 
-# Use Supervisor to run and manage all other services
+
 CMD ["/usr/local/bin/supervisord", "-c", "/etc/supervisord.conf"]
 
-# Install required packages
+
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E5267A6C C300EE8C && \
 	echo 'deb http://ppa.launchpad.net/ondrej/php/ubuntu xenial main' > /etc/apt/sources.list.d/ondrej-php7.list && \
 	echo 'deb http://ppa.launchpad.net/nginx/development/ubuntu xenial main' > /etc/apt/sources.list.d/nginx.list && \
@@ -41,13 +41,13 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E5267A6C C300EE8C &
 	curl https://bootstrap.pypa.io/ez_setup.py -o - | python && \
 	easy_install supervisor
 
-# Copy supervisor config files, Laravel cron file, & default site configuration
+
 COPY provision/conf/supervisor.conf /etc/supervisord.conf
 COPY provision/service/* /etc/supervisord/
 COPY provision/cron/laravel /etc/cron.d/laravel
 COPY provision/conf/nginx-default /etc/nginx/sites-available/default
 
-# Configure PHP, Nginx, Redis, and clean up
+
 RUN sed -i 's/;opcache.enable=0/opcache.enable=1/g' /etc/php/7.0/fpm/php.ini && \
 	sed -i 's/;opcache.fast_shutdown=0/opcache.fast_shutdown=1/g' /etc/php/7.0/fpm/php.ini && \
 	sed -i 's/;opcache.enable_file_override=0/opcache.enable_file_override=1/g' /etc/php/7.0/fpm/php.ini && \
@@ -70,12 +70,12 @@ RUN sed -i 's/;opcache.enable=0/opcache.enable=1/g' /etc/php/7.0/fpm/php.ini && 
 	apt-get clean && \
 	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Set the language
+
 RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
-# Expose volumes and ports
-#VOLUME ["/share"]
+
+
 EXPOSE 80
