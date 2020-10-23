@@ -1,74 +1,57 @@
-# Docker Laravel
+Projeto Tópicos Laravel com Zabbix
 
-The Dockerfile and associated setup files for a Laravel or Lumen Docker container.
+Este pacote fornece uma biblioteca de API do Zabbix para o Laravel Framework. Ele usa a classe PhpZabbixApi gerada pelo pacote http://github.com/confirm/PhpZabbixApi.
 
-![](https://images.microbadger.com/badges/version/liamfiddler/docker-laravel.svg) ![](https://images.microbadger.com/badges/image/liamfiddler/docker-laravel.svg)
+    NOTA: Esta versão foi testada apenas com Zabbix Server 3.0. *. Não tenho certeza se funciona com outras versões também.
 
-### Packages
+Instalação
 
-The following packages are installed:
-- Nginx
-- PHP (with GD, Mcrypt, Sqlite, MySQL, and Opcache)
-- Redis (configured as a LRU cache)
-- NPM
+Para começar, você deve adicionar a dependência do Composer becker / laravel-zabbix-api ao seu projeto:
 
-Processes are managed by Supervisor.
+compositor requer becker / laravel-zabbix-api
 
-A cron job has been set up which will call the Laravel scheduler once per minute.
+O Dockerfile e os arquivos de configuração associados para um contêiner Laravel ou Lumen Docker.
 
-Before using Redis with Laravel, you will need to install the `predis/predis`
-package via Composer. Refer to the [Laravel Redis documentation](https://laravel.com/docs/master/redis).
+Pacotes
 
+Os seguintes pacotes estão instalados:
 
-### Adding your website files
+    Nginx
+    PHP (com GD, Mcrypt, Sqlite, MySQL e Opcache)
+    Redis (configurado como um cache LRU)
+    NPM
 
-ADD/COPY your Laravel/Lumen project to the `/share` directory in your
-Dockerfile, or if you are not extending this container you can mount
-your local directory to `/share` as a volume.
+Os processos são gerenciados pelo Supervisor.
 
+Um cron job foi configurado para chamar o agendador do Laravel uma vez por minuto.
 
-### Executing Artisan commands when the container is run
+Antes de usar o Redis com Laravel, você precisará instalar o pacote predis / predis via Composer. Consulte a documentação do Laravel Redis.
+Adicionando arquivos do seu site
 
-Any [Supervisor program:x config files](http://supervisord.org/configuration.html#program-x-section-values)
-you ADD/COPY to the `/etc/supervisord/` directory will be automatically run when
-the container starts. Make sure the filename ends with `.conf`.
+ADICIONE / COPIE seu projeto Laravel / Lumen para o diretório / share em seu Dockerfile, ou se você não estiver estendendo este contêiner, você pode montar seu diretório local em / share como um volume.
+Executar comandos do Artisan quando o contêiner é executado
 
+Qualquer programa do Supervisor: x arquivos de configuração que você ADICIONAR / COPIAR no diretório / etc / supervisord / serão executados automaticamente quando o contêiner for iniciado. Certifique-se de que o nome do arquivo termine com .conf.
+Uso para projetos não Laravel ou Lumen
 
-### Usage for non-Laravel or Lumen projects
+Se você quiser usar este contêiner para um projeto PHP genérico, você pode montar seu projeto no diretório / share / public.
 
-If you want to use this container for a generic PHP project you can mount
-your project to the `/share/public` directory.
+Você também deve remover o cron job do Laravel que é executado a cada minuto, adicionando o seguinte comando ao seu Dockerfile:
 
-You should also remove the Laravel cron job that runs every minute
-by adding the following command to your Dockerfile:
-
-```
 RUN rm /etc/cron.d/laravel
-```
 
+Acesso ao terminal
 
-### Terminal access
+SSH não está configurado neste contêiner, presume-se que você obterá acesso por meio do seguinte comando:
 
-SSH is not configured in this container, it is assumed you will gain access
-via the following command:
-
-```
 docker exec -it YOUR_CONTAINER_NAME bash
-```
 
-Once you are in you will need to set the `TERM` environment otherwise some
-commands, like `clear` or `nano`, will fail.
+Depois de entrar, você precisará definir o ambiente TERM, caso contrário, alguns comandos, como clear ou nano, irão falhar.
 
-```
-export TERM=xterm
-```
+export TERM = xterm
 
+Opcache
 
-### Opcache
+O PHP Opcache foi habilitado e configurado para revalidar a cada 60 segundos. Para o desenvolvimento local, você pode desejar desativar o Opcache:
 
-PHP Opcache has been enabled and configured to revalidate every 60 seconds.
-For local development you may wish to disable Opcache:
-
-```
-docker exec -it YOUR_CONTAINER_NAME bash -c "sed -i 's/opcache.enable=1/opcache.enable=0/g' /etc/php/7.0/fpm/php.ini && sed -i 's/opcache.revalidate_freq=60/opcache.revalidate_freq=0/g' /etc/php/7.0/fpm/php.ini && supervisorctl reload"
-```
+docker exec -it YOUR_CONTAINER_NAME bash -c "sed -i 's / opcache.enable = 1 / opcache.enable = 0 / g' /etc/php/7.0/fpm/php.ini && sed -i 's / opcache. revalidate_freq = 60 / opcache.revalidate_freq = 0 / g '/etc/php/7.0/fpm/php.ini && supervisorctl reload "
